@@ -44,7 +44,7 @@ for root, _, files in os.walk("data_folder"):
     for file in files:
         if file.endswith(".txt"):
             try:
-                with open(os.path.join(root, file)， "r") as txt_file:
+                with open(os.path.join(root, file), "r") as txt_file:
                     for line in txt_file:
                         line = line.strip()
                         if line:
