@@ -40,21 +40,6 @@ API 提供了灵活的参数设置，使您可以根据需求定制请求。
 
    [https://ipdb.030101.xyz?type=proxy&down=true](https://ipdb.030101.xyz?type=proxy&down=true)
 
-## 响应格式
-
-API 的响应为纯文本格式，每行一个 IP 地址。如果您选择下载，响应将包含适当的下载头信息。
-
-### 下载响应示例
-
-IP_Address_1
-IP_Address_2
-...
-
-### 直接返回文本响应示例
-
-IP_Address_1
-IP_Address_2
-...
 
 ## 注意事项
 
