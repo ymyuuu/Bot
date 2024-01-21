@@ -13,7 +13,7 @@ zip_file_name = "data.zip"
 ip_txt_file_name = "ip.txt"
 
 username = "ymyuuu"
-repo_name = "Proxy-IP-library"
+repo_name = "IPDB"
 token = os.environ.get("ME_GITHUB_TOKEN", "")
 
 start_time = datetime.now() + timedelta(hours=8)
