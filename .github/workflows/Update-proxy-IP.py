@@ -58,15 +58,6 @@ for root, _, files in os.walk("data_folder"):
                 print(f"Error reading and merging txt files: {str(e)}")
 
 try:
-    with open(ip_txt_file_name, "w") as new_ip_file:
-        new_ip_file.write(f"{len(ip_set)}")
-
-        for ip in sorted(ip_set, key=lambda x: [int(part) for part in x.split('.')]):
-            new_ip_file.write(ip + '\n')
-except Exception as e:
-    print(f"Error saving new IP records: {str(e)}")
-
-try:
     with open(ip_txt_file_name, "r") as file:
         ip_txt_content = file.read()
 
