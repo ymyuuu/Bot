@@ -46,7 +46,7 @@
 - 下载 Cloudflare IPv4 地址列表和 Cloudflare IPv6 地址列表：
   - `https://{dynamicDomain}/?type=cfv4;cfv6&down=true`
 
-# 免责声明
+## 免责声明
 
 1. IPDB仅面向非大陆地区用户，大陆地区用户在使用时需自行承担因法律法规限制可能带来的风险。
 2. IPDB的数据源包括但不限于互联网、开放数据库等公开网络资源。
