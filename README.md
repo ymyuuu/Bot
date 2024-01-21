@@ -32,14 +32,8 @@
 
 ## 请求示例
 
-- `[https://{dynamicDomain}/?type=proxy](https://{dynamicDomain}/?type=proxy)`
-  获取反代 IP 地址列表
+- [反代 IP 地址列表](https://{dynamicDomain}/?type=proxy)
+- [Cloudflare IPv4 地址列表和反代 IP 地址列表](https://{dynamicDomain}/?type=cfv4;proxy)
+- [下载优选反代 IP 地址列表](https://{dynamicDomain}/?type=bestproxy&down=true)
+- [下载 Cloudflare IPv4 地址列表和 Cloudflare IPv6 地址列表](https://{dynamicDomain}/?type=cfv4;cfv6&down=true)
 
-- `[https://{dynamicDomain}/?type=cfv4;proxy](https://{dynamicDomain}/?type=cfv4;proxy)`
-  获取 Cloudflare IPv4 地址列表和反代 IP 地址列表
-
-- `[https://{dynamicDomain}/?type=bestproxy&down=true](https://{dynamicDomain}/?type=bestproxy&down=true)`
-  下载优选反代 IP 地址列表
-
-- `[https://{dynamicDomain}/?type=cfv4;cfv6&down=true](https://{dynamicDomain}/?type=cfv4;cfv6&down=true)`
-  下载 Cloudflare IPv4 地址列表和 Cloudflare IPv6 地址列表
