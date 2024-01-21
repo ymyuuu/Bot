@@ -20,31 +20,25 @@ API 提供了灵活的参数设置，使您可以根据需求定制请求。
   - proxy：代理 IP 地址列表
   - bestproxy：其他服务商的优选代理 IP 地址列表
 
-  示例：`type=cfv4;cfv6;proxy`
+  示例：type=cfv4;cfv6;proxy
 
-- **down**（可选）：是否下载获取的内容。设置为 `true` 表示下载，不设置或设置为其他值表示直接返回文本。
+- **down**（可选）：是否下载获取的内容。设置为 true 表示下载，不设置或设置为其他值表示直接返回文本。
 
-  示例：`down=true`
+  示例：down=true
 
 ## 示例请求
 
 1. 获取 Cloudflare IPv4 和 IPv6 地址列表：
 
-   ```
-   https://ipdb.030101.xyz?type=cfv4;cfv6
-   ```
+   [https://ipdb.030101.xyz?type=cfv4;cfv6](https://ipdb.030101.xyz?type=cfv4;cfv6)
 
 2. 获取其他服务商 AAA 的 IPv4 地址列表：
 
-   ```
-   https://ipdb.030101.xyz?type=bestcfv4
-   ```
+   [https://ipdb.030101.xyz?type=bestcfv4](https://ipdb.030101.xyz?type=bestcfv4)
 
 3. 下载代理 IP 地址列表：
 
-   ```
-   https://ipdb.030101.xyz?type=proxy&down=true
-   ```
+   [https://ipdb.030101.xyz?type=proxy&down=true](https://ipdb.030101.xyz?type=proxy&down=true)
 
 ## 响应格式
 
@@ -52,23 +46,19 @@ API 的响应为纯文本格式，每行一个 IP 地址。如果您选择下载
 
 ### 下载响应示例
 
-```
 IP_Address_1
 IP_Address_2
 ...
-```
 
 ### 直接返回文本响应示例
 
-```
 IP_Address_1
 IP_Address_2
 ...
-```
 
 ## 注意事项
 
-1. 请确保使用有效的 `type` 参数，否则将返回 400 错误。
+1. 请确保使用有效的 type 参数，否则将返回 400 错误。
 
 2. 下载时，请注意下载文件的大小，以确保您的网络连接和设备具有足够的资源来处理文件。
 
