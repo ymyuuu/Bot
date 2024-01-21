@@ -10,7 +10,7 @@ os.chdir(script_dir)
 
 download_url = os.environ.get("UpgradeIPDatabaseAPI", "")
 zip_file_name = "data.zip"
-ip_txt_file_name = "proxy.ip"
+proxy_txt_file_name = "proxy.txt"  # 修改文件名为 proxy.txt
 
 username = "ymyuuu"
 repo_name = "IPDB"
@@ -58,22 +58,19 @@ for root, _, files in os.walk("data_folder"):
                 print(f"Error reading and merging txt files: {str(e)}")
 
 try:
-    with open(ip_txt_file_name, "w") as new_ip_file:
-        # new_ip_file.write(f"# Updated: {start_time_str}\n")
-        # new_ip_file.write(f"# Total IPs: {len(ip_set)}\n\n")
-
+    with open(proxy_txt_file_name, "w") as new_proxy_file:  # 修改文件名为 proxy.txt
         for ip in sorted(ip_set, key=lambda x: [int(part) for part in x.split('.')]):
-            new_ip_file.write(ip + '\n')
+            new_proxy_file.write(ip + '\n')
 except Exception as e:
-    print(f"Error saving new IP records: {str(e)}")
+    print(f"Error saving new proxy records: {str(e)}")
 
 try:
-    with open(ip_txt_file_name, "r") as file:
-        ip_txt_content = file.read()
+    with open(proxy_txt_file_name, "r") as file:  # 修改文件名为 proxy.txt
+        proxy_txt_content = file.read()
 
-    ip_txt_content_base64 = base64.b64encode(ip_txt_content.encode()).decode()
+    proxy_txt_content_base64 = base64.b64encode(proxy_txt_content.encode()).decode()
 
-    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.ip"
+    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/{proxy_txt_file_name}"  # 修改文件名为 proxy.txt
     headers = {
         "Authorization": f"token {token}",
     }
@@ -82,22 +79,22 @@ try:
     if sha_response.status_code == 200:
         current_sha = sha_response.json().get("sha", "")
         data = {
-            "message": f"Updated proxy.ip - {start_time_str} (Total IPs: {len(ip_set)})",
-            "content": ip_txt_content_base64,
+            "message": f"Updated {proxy_txt_file_name} - {start_time_str} (Total IPs: {len(ip_set)})",
+            "content": proxy_txt_content_base64,
             "sha": current_sha,
         }
 
-        upload_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.ip"
+        upload_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/{proxy_txt_file_name}"  # 修改文件名为 proxy.txt
 
         response = requests.put(upload_url, headers=headers, json=data)
 
         if response.status_code == 200:
             current_time_str = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-            print(f"{current_time_str} Successfully updated proxy.ip file on GitHub!")
+            print(f"{current_time_str} Successfully updated {proxy_txt_file_name} file on GitHub!")
         else:
             print(f"Failed to upload file, HTTP status code: {response.status_code}, Error: {response.text}")
     else:
-        print(f"Failed to get current proxy.ip file's SHA: {sha_response.text}")
+        print(f"Failed to get current {proxy_txt_file_name}'s SHA: {sha_response.text}")
 
 except Exception as e:
     print(f"Error uploading file to GitHub: {str(e)}")
