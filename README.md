@@ -6,13 +6,7 @@
 
 **API 地址：** [https://ipdb.030101.xyz](https://ipdb.030101.xyz)
 
-## 请求格式
-
-API 提供了灵活的参数设置，使您可以根据需求定制请求。
-
 # IPDB API 参数说明
-
-欢迎使用 IPDB API，以下是 API 请求中可用的参数详细说明。
 
 ## 参数列表
 
@@ -42,11 +36,11 @@ API 提供了灵活的参数设置，使您可以根据需求定制请求。
 
    [https://ipdb.030101.xyz?type=cfv4;cfv6](https://ipdb.030101.xyz?type=cfv4;cfv6)
 
-2. 获取其他服务商 AAA 的 IPv4 地址列表：
+2. 获取优选反代 IP 地址列表：
 
    [https://ipdb.030101.xyz?type=bestcfv4](https://ipdb.030101.xyz?type=bestcfv4)
 
-3. 下载代理 IP 地址列表：
+3. 下载反代 IP 地址列表：
 
    [https://ipdb.030101.xyz?type=proxy&down=true](https://ipdb.030101.xyz?type=proxy&down=true)
 
