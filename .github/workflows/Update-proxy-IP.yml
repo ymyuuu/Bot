@@ -31,5 +31,5 @@ jobs:
     - name: Update-proxy-IP
       env:
         ME_GITHUB_TOKEN: ${{ secrets.ME_GITHUB_TOKEN }}
-        UpgradeIPDatabaseAPI: ${{ secrets.UpgradeIPDatabaseAPI }}
+        IPDB: ${{ secrets.IPDB }}
       run: python .github/workflows/Update-proxy-IP.py
