@@ -5,6 +5,11 @@
 欢迎使用 IPDB API，这是一个用于获取不同类型 IP 地址信息的简单而强大的接口。通过 IPDB API，您可以获取来自不同服务提供商的 IPv4 和 IPv6 地址信息，以及代理 IP 地址列表。
 
 **API 地址：** [https://ipdb.030101.xyz](https://ipdb.030101.xyz)
+## 交流群和通知频道
+
+欢迎加入我们的交流群 [Preferred IP Push Chat](https://t.me/Preferred_IP_Push_Chat)，这里是讨论反代IP使用和获取更新的社群。
+
+同时，你可以关注我们的通知频道 [Preferred IP Push](https://t.me/Preferred_IP_Push)，获取最新的IP推送和更新通知。
 
 ## IPDB API 参数说明
 
