@@ -32,16 +32,14 @@
 
 ## 请求示例
 
-1. 获取 Cloudflare IPv4 和 IPv6 地址列表：
+- `[https://{dynamicDomain}/?type=proxy](https://{dynamicDomain}/?type=proxy)`
+  获取反代 IP 地址列表
 
-   [https://ipdb.030101.xyz?type=cfv4;cfv6](https://ipdb.030101.xyz?type=cfv4;cfv6)
+- `[https://{dynamicDomain}/?type=cfv4;proxy](https://{dynamicDomain}/?type=cfv4;proxy)`
+  获取 Cloudflare IPv4 地址列表和反代 IP 地址列表
 
-2. 获取优选反代 IP 地址列表：
+- `[https://{dynamicDomain}/?type=bestproxy&down=true](https://{dynamicDomain}/?type=bestproxy&down=true)`
+  下载优选反代 IP 地址列表
 
-   [https://ipdb.030101.xyz?type=bestproxy](https://ipdb.030101.xyz?type=bestproxy)
-
-3. 下载反代 IP 地址列表：
-
-   [https://ipdb.030101.xyz?type=proxy&down=true](https://ipdb.030101.xyz?type=proxy&down=true)
-
-希望您通过 IPDB API 获得所需的 IP 地址信息，如果有任何问题或建议，请随时联系我们！
+- `[https://{dynamicDomain}/?type=cfv4;cfv6&down=true](https://{dynamicDomain}/?type=cfv4;cfv6&down=true)`
+  下载 Cloudflare IPv4 地址列表和 Cloudflare IPv6 地址列表
