@@ -34,17 +34,17 @@
 
 ### 请求示例
 
-- 获取反代 IP 地址列表：
-  - `https://{dynamicDomain}/?type=proxy`
+- [https://ipdb.030101.xyz/?type=proxy](https://ipdb.030101.xyz/?type=proxy)
+  - *获取反代 IP 地址列表*
 
-- 获取 Cloudflare IPv4 地址列表和反代 IP 地址列表：
-  - `https://{dynamicDomain}/?type=cfv4;proxy`
+- [https://ipdb.030101.xyz/?type=cfv4;proxy](https://ipdb.030101.xyz/?type=cfv4;proxy)
+  - *获取 Cloudflare IPv4 地址列表和反代 IP 地址列表*
 
-- 下载优选反代 IP 地址列表：
-  - `https://{dynamicDomain}/?type=bestproxy&down=true`
+- [https://ipdb.030101.xyz/?type=bestproxy&down=true](https://ipdb.030101.xyz/?type=bestproxy&down=true)
+  - *下载优选反代 IP 地址列表*
 
-- 下载 Cloudflare IPv4 地址列表和 Cloudflare IPv6 地址列表：
-  - `https://{dynamicDomain}/?type=cfv4;cfv6&down=true`
+- [https://ipdb.030101.xyz/?type=cfv4;cfv6&down=true](https://ipdb.030101.xyz/?type=cfv4;cfv6&down=true)
+  - *下载 Cloudflare IPv4 地址列表和 Cloudflare IPv6 地址列表*
 
 ## 免责声明
 
