@@ -10,7 +10,7 @@ os.chdir(script_dir)
 
 download_url = os.environ.get("UpgradeIPDatabaseAPI", "")
 zip_file_name = "data.zip"
-ip_txt_file_name = "ip.txt"
+ip_txt_file_name = "proxy.ip"
 
 username = "ymyuuu"
 repo_name = "IPDB"
@@ -73,7 +73,7 @@ try:
 
     ip_txt_content_base64 = base64.b64encode(ip_txt_content.encode()).decode()
 
-    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/ip.txt"
+    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.ip"
     headers = {
         "Authorization": f"token {token}",
     }
@@ -82,22 +82,22 @@ try:
     if sha_response.status_code == 200:
         current_sha = sha_response.json().get("sha", "")
         data = {
-            "message": f"Updated ip.txt - {start_time_str} (Total IPs: {len(ip_set)})",
+            "message": f"Updated proxy.ip - {start_time_str} (Total IPs: {len(ip_set)})",
             "content": ip_txt_content_base64,
             "sha": current_sha,
         }
 
-        upload_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/ip.txt"
+        upload_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.ip"
 
         response = requests.put(upload_url, headers=headers, json=data)
 
         if response.status_code == 200:
             current_time_str = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-            print(f"{current_time_str} Successfully updated ip.txt file on GitHub!")
+            print(f"{current_time_str} Successfully updated proxy.ip file on GitHub!")
         else:
             print(f"Failed to upload file, HTTP status code: {response.status_code}, Error: {response.text}")
     else:
-        print(f"Failed to get current ip.txt file's SHA: {sha_response.text}")
+        print(f"Failed to get current proxy.ip file's SHA: {sha_response.text}")
 
 except Exception as e:
     print(f"Error uploading file to GitHub: {str(e)}")
