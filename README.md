@@ -44,29 +44,4 @@
 
    [https://ipdb.030101.xyz?type=proxy&down=true](https://ipdb.030101.xyz?type=proxy&down=true)
 
-## 注意事项
-
-1. 请确保使用有效的 type 参数，否则将返回 400 错误。
-
-2. 下载时，请注意下载文件的大小，以确保您的网络连接和设备具有足够的资源来处理文件。
-
-3. API 地址 [https://ipdb.030101.xyz](https://ipdb.030101.xyz) 随时提供服务，但请不要滥用。如果有持续的大量请求，可能会导致您的 IP 被列入黑名单。
-
-希望您通过 IPDB API 获得所需的 IP 地址信息，如果有任何问题或建议，请随时联系我们！
-
-## 示例代码
-
-以下是使用 JavaScript 中的 Fetch API 进行请求的示例代码：
-
-```javascript
-const apiUrl = 'https://ipdb.030101.xyz?type=cfv4;cfv6';
-
-fetch(apiUrl)
-    .then(response => response.text())
-    .then(data => console.log(data))
-    .catch(error => console.error('Error:', error));
-```
-
-请根据您的编程语言和框架选择合适的方式进行 API 请求。
-
 希望您通过 IPDB API 获得所需的 IP 地址信息，如果有任何问题或建议，请随时联系我们！
