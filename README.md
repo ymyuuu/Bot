@@ -38,7 +38,7 @@
 
 2. 获取优选反代 IP 地址列表：
 
-   [https://ipdb.030101.xyz?type=bestcfv4](https://ipdb.030101.xyz?type=bestcfv4)
+   [https://ipdb.030101.xyz?type=bestproxy](https://ipdb.030101.xyz?type=bestproxy)
 
 3. 下载反代 IP 地址列表：
 
