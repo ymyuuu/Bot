@@ -58,6 +58,16 @@ for root, _, files in os.walk("data_folder"):
                 print(f"Error reading and merging txt files: {str(e)}")
 
 try:
+    with open(ip_txt_file_name, "w") as new_ip_file:
+        # new_ip_file.write(f"# Updated: {start_time_str}\n")
+        # new_ip_file.write(f"# Total IPs: {len(ip_set)}\n\n")
+
+        for ip in sorted(ip_set, key=lambda x: [int(part) for part in x.split('.')]):
+            new_ip_file.write(ip + '\n')
+except Exception as e:
+    print(f"Error saving new IP records: {str(e)}")
+
+try:
     with open(ip_txt_file_name, "r") as file:
         ip_txt_content = file.read()
 
@@ -72,7 +82,7 @@ try:
     if sha_response.status_code == 200:
         current_sha = sha_response.json().get("sha", "")
         data = {
-            "message": f"Updated ip.txt - {start_time_str} (Total IPs: {len(ip_set)})",
+            "message": f"Successfully updated ip.txt - {start_time_str} (Total IPs: {len(ip_set)})",
             "content": ip_txt_content_base64,
             "sha": current_sha,
         }
