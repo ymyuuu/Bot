@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
-download_url = os.environ.get("UpgradeIPDatabaseAPI", "")
+download_url = os.environ.get("IPDB", "")
 zip_file_name = "data.zip"
 proxy_txt_file_name = "proxy.txt"  # 修改文件名为 proxy.txt
 
