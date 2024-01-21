@@ -59,8 +59,7 @@ for root, _, files in os.walk("data_folder"):
 
 try:
     with open(ip_txt_file_name, "w") as new_ip_file:
-        new_ip_file.write(f"# Updated: {start_time_str}\n")
-        new_ip_file.write(f"# Total IPs: {len(ip_set)}\n\n")
+        new_ip_file.write(f"{len(ip_set)}")
 
         for ip in sorted(ip_set, key=lambda x: [int(part) for part in x.split('.')]):
             new_ip_file.write(ip + '\n')
@@ -82,7 +81,7 @@ try:
     if sha_response.status_code == 200:
         current_sha = sha_response.json().get("sha", "")
         data = {
-            "message": f"Successfully updated ip.txt - {start_time_str} (Total IPs: {len(ip_set)})",
+            "message": f"Updated ip.txt - {start_time_str} (Total IPs: {len(ip_set)})",
             "content": ip_txt_content_base64,
             "sha": current_sha,
         }
