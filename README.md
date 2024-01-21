@@ -15,8 +15,6 @@
   - 支持的类型：
     - `cfv4`：Cloudflare IPv4 地址列表
     - `cfv6`：Cloudflare IPv6 地址列表
-    - `bestcfv4`：其他服务商 IPv4 地址列表（示例服务商 AAA）
-    - `bestcfv6`：其他服务商 IPv6 地址列表（示例服务商 BBB）
     - `proxy`：代理 IP 地址列表
     - `bestproxy`：其他服务商的优选代理 IP 地址列表
   - 示例： `type=cfv4;cfv6;proxy`
