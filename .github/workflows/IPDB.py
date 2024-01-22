@@ -21,7 +21,6 @@ def download_file(url, filename):
         response.raise_for_status()
         with open(filename, 'wb') as file:
             file.write(response.content)
-        print(f'{url} 下载成功，保存为 {filename}')
     except requests.exceptions.RequestException as e:
         raise RuntimeError(f'Error downloading {url}: {e}')
 
@@ -29,7 +28,6 @@ def unzip_file(zip_filename, extract_folder):
     try:
         with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
             zip_ref.extractall(extract_folder)
-        print(f'{zip_filename} Unzipped, saved to {extract_folder}')
     except Exception as e:
         raise RuntimeError(f'Error unzipping {zip_filename}: {e}')
 
@@ -42,7 +40,6 @@ def merge_txt_files(folder_path, output_filename):
                         file_path = os.path.join(root, file)
                         with open(file_path, 'r') as input_file:
                             output_file.write(input_file.read())
-        print(f'所有txt文件已合并为 {output_filename}')
     except Exception as e:
         raise RuntimeError(f'Error merging files: {e}')
 
@@ -61,14 +58,14 @@ def write_ips_to_file(ips, output_file_path):
         with open(output_file_path, 'w') as output_file:
             for ip in ips:
                 output_file.write(ip + '\n')
-        print(f'所有IP地址已提取并保存到 {output_file_path}，随机打乱完成')
     except Exception as e:
         raise RuntimeError(f'Error writing to file: {e}')
 
 # 获取当前时间
 start_time = datetime.now() + timedelta(hours=8)
 start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
-print(f"\n{start_time_str} 正在下载更新的代理IP库...\n")
+# print(f"\n{start_time_str} 正在下载更新的代理IP库...\n")
+print(f"\n{start_time_str} Downloading updated proxy IP library...\n")
 
 # 下载链接 1 的文件，并命名为 1.zip
 url1 = ipdb_url
@@ -152,9 +149,6 @@ except RuntimeError as e:
 proxy_txt_file_path = "proxy.txt"
 username = "ymyuuu"
 repo_name = "IPDB"
-start_time = datetime.now() + timedelta(hours=8)
-start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
-print(f"\n{start_time_str} 正在上传代理IP文件至GitHub...\n")
 
 try:
     with open(proxy_txt_file_path, "r") as file:
