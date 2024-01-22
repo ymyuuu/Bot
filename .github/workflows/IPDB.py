@@ -54,34 +54,28 @@ print(f"\n{start_time_str} 正在下载更新的代理IP库...\n")
 url1 = ipdb_url
 filename1 = '1.zip'
 download_file(url1, filename1)
-print(f'{url1} 下载完成，保存为 {filename1}')
 
 # 解压 1.zip 到文件夹 1
 extract_folder1 = '1'
 unzip_file(filename1, extract_folder1)
-print(f'{filename1} 解压完成，保存到 {extract_folder1}')
 
 # 下载链接 2 的文件，并命名为 2.zip
 url2 = other_url
 filename2 = '2.zip'
 download_file(url2, filename2)
-print(f'{url2} 下载完成，保存为 {filename2}')
 
 # 解压 2.zip 到文件夹 2
 extract_folder2 = '2'
 unzip_file(filename2, extract_folder2)
-print(f'{filename2} 解压完成，保存到 {extract_folder2}')
 
 # 找到2文件夹里cloudflare-better-ip-main文件夹下的cloudflare文件夹
 cloudflare_folder_path = os.path.join(extract_folder2, 'cloudflare-better-ip-main', 'cloudflare')
 
 # 合并1文件夹里的所有txt文件为all1.txt
 merge_txt_files('1', 'all1.txt')
-print('1文件夹内的所有txt文件已合并为all1.txt')
 
 # 合并2文件夹里cloudflare文件夹中的所有txt文件为all2.txt
 merge_txt_files(cloudflare_folder_path, 'all2.txt')
-print(f'在2文件夹里cloudflare-better-ip-main文件夹下的cloudflare文件夹中的所有txt文件已合并为all2.txt')
 
 # 提取all1.txt中的IP地址，并去重
 ips_all1 = list(set(extract_ips_from_file('all1.txt')))
@@ -97,15 +91,11 @@ random.shuffle(all_ips)
 
 # 输出到proxy.txt
 write_ips_to_file(all_ips, 'proxy.txt')
-print('所有IP地址已提取并保存到proxy.txt，随机打乱完成')
 
 # GitHub上传代码
 proxy_txt_file_path = "proxy.txt"
 username = "ymyuuu"
 repo_name = "IPDB"
-start_time = datetime.now() + timedelta(hours=8)
-start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
-print(f"\n{start_time_str} 正在上传代理IP文件至GitHub...\n")
 
 try:
     with open(proxy_txt_file_path, "r") as file:
