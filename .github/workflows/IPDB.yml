@@ -24,7 +24,7 @@ jobs:
         pip install requests
 
     - name: Run Python Script
-      run: python path/to/your/script.py
+      run: python IPDB.py
       env:
         ME_GITHUB_TOKEN: ${{ secrets.ME_GITHUB_TOKEN }}
         IPDB: ${{ secrets.IPDB }}
