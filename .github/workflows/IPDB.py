@@ -16,39 +16,58 @@ ipdb_url = os.environ.get("IPDB", "")
 other_url = os.environ.get("OTHER", "")
 
 def download_file(url, filename):
-    response = requests.get(url)
-    with open(filename, 'wb') as file:
-        file.write(response.content)
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        with open(filename, 'wb') as file:
+            file.write(response.content)
+    except requests.exceptions.RequestException as e:
+        print(f'Error downloading {url}: {e}')
 
 def unzip_file(zip_filename, extract_folder):
-    with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
-        zip_ref.extractall(extract_folder)
+    try:
+        with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
+            zip_ref.extractall(extract_folder)
+    except Exception as e:
+        print(f'Error unzipping {zip_filename}: {e}')
 
 def merge_txt_files(folder_path, output_filename):
-    with open(output_filename, 'w') as output_file:
-        for root, _, files in os.walk(folder_path):
-            for file in files:
-                if file.endswith('.txt'):
-                    file_path = os.path.join(root, file)
-                    with open(file_path, 'r') as input_file:
-                        output_file.write(input_file.read())
+    try:
+        with open(output_filename, 'w') as output_file:
+            for root, _, files in os.walk(folder_path):
+                for file in files:
+                    if file.endswith('.txt'):
+                        file_path = os.path.join(root, file)
+                        with open(file_path, 'r') as input_file:
+                            output_file.write(input_file.read())
+    except Exception as e:
+        print(f'Error merging files: {e}')
 
 def extract_ips_from_file(file_path):
-    with open(file_path, 'r') as file:
-        content = file.read()
-        # 使用正则表达式提取IP地址
-        ips = re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', content)
-        return ips
+    try:
+        with open(file_path, 'r') as file:
+            content = file.read()
+            # 使用正则表达式提取IP地址
+            ips = re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', content)
+            return ips
+    except Exception as e:
+        print(f'Error extracting IP addresses: {e}')
+        return []
 
 def write_ips_to_file(ips, output_file_path):
-    with open(output_file_path, 'w') as output_file:
-        for ip in ips:
-            output_file.write(ip + '\n')
+    try:
+        with open(output_file_path, 'w') as output_file:
+            for ip in ips:
+                output_file.write(ip + '\n')
+    except Exception as e:
+        print(f'Error writing to file: {e}')
 
 # 获取当前时间
 start_time = datetime.now() + timedelta(hours=8)
 start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
-print(f"\n{start_time_str} 正在下载更新的代理IP库...\n")
+# print(f"\n{start_time_str} 正在下载更新的代理IP库...\n")
+print(f"\n{start_time_str} Downloading updated proxy IP library...\n")
+
 
 # 下载链接 1 的文件，并命名为 1.zip
 url1 = ipdb_url
@@ -98,35 +117,36 @@ username = "ymyuuu"
 repo_name = "IPDB"
 
 try:
-    with open(proxy_txt_file_path, "r") as file:
+    with open(proxy_txt_file_name, "r") as file:  # 修改文件名为 proxy.txt
         proxy_txt_content = file.read()
 
     proxy_txt_content_base64 = base64.b64encode(proxy_txt_content.encode()).decode()
 
-    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
+    get_sha_url = f"https://proxy.api.030101.xyz/https://api.github.com/repos/{username}/{repo_name}/contents/{proxy_txt_file_name}"  # 修改文件名为 proxy.txt
     headers = {
-        "Authorization": f"token {github_token}",
+        "Authorization": f"token {token}",
     }
     sha_response = requests.get(get_sha_url, headers=headers)
 
     if sha_response.status_code == 200:
         current_sha = sha_response.json().get("sha", "")
         data = {
-            "message": f"更新 proxy.txt - {start_time_str} (总IP数: {len(proxy_txt_content.splitlines())})",
+            "message": f"Updated {proxy_txt_file_name} - {start_time_str} (Total IPs: {len(ip_set)})",
             "content": proxy_txt_content_base64,
             "sha": current_sha,
         }
 
-        upload_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
+        upload_url = f"https://proxy.api.030101.xyz/https://api.github.com/repos/{username}/{repo_name}/contents/{proxy_txt_file_name}"  # 修改文件名为 proxy.txt
+
         response = requests.put(upload_url, headers=headers, json=data)
 
         if response.status_code == 200:
             current_time_str = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-            print(f"{current_time_str} GitHub上proxy.txt文件更新成功!")
+            print(f"{current_time_str} Successfully updated {proxy_txt_file_name} file on GitHub!")
         else:
-            print(f"上传文件失败，HTTP状态码: {response.status_code}, 错误: {response.text}")
+            print(f"Failed to upload file, HTTP status code: {response.status_code}, Error: {response.text}")
     else:
-        print(f"获取当前 proxy.txt SHA值失败: {sha_response.text}")
+        print(f"Failed to get current {proxy_txt_file_name}'s SHA: {sha_response.text}")
 
 except Exception as e:
-    print(f"上传文件至GitHub时发生错误: {str(e)}")
+    print(f"Error uploading file to GitHub: {str(e)}")
