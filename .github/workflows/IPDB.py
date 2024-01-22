@@ -23,15 +23,15 @@ def download_file(url, filename):
             file.write(response.content)
         print(f'{url} 下载成功，保存为 {filename}')
     except requests.exceptions.RequestException as e:
-        raise RuntimeError(f'下载 {url} 时发生错误: {e}')
+        raise RuntimeError(f'Error downloading {url}: {e}')
 
 def unzip_file(zip_filename, extract_folder):
     try:
         with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
             zip_ref.extractall(extract_folder)
-        print(f'{zip_filename} 解压完成，保存到 {extract_folder}')
+        print(f'{zip_filename} Unzipped, saved to {extract_folder}')
     except Exception as e:
-        raise RuntimeError(f'解压 {zip_filename} 时发生错误: {e}')
+        raise RuntimeError(f'Error unzipping {zip_filename}: {e}')
 
 def merge_txt_files(folder_path, output_filename):
     try:
@@ -42,9 +42,9 @@ def merge_txt_files(folder_path, output_filename):
                         file_path = os.path.join(root, file)
                         with open(file_path, 'r') as input_file:
                             output_file.write(input_file.read())
-        print(f'{folder_path} 内的所有txt文件已合并为 {output_filename}')
+        print(f'所有txt文件已合并为 {output_filename}')
     except Exception as e:
-        raise RuntimeError(f'合并文件时发生错误: {e}')
+        raise RuntimeError(f'Error merging files: {e}')
 
 def extract_ips_from_file(file_path):
     try:
@@ -54,7 +54,7 @@ def extract_ips_from_file(file_path):
             ips = re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', content)
             return ips
     except Exception as e:
-        raise RuntimeError(f'提取IP地址时发生错误: {e}')
+        raise RuntimeError(f'Error extracting IP addresses: {e}')
 
 def write_ips_to_file(ips, output_file_path):
     try:
@@ -63,7 +63,7 @@ def write_ips_to_file(ips, output_file_path):
                 output_file.write(ip + '\n')
         print(f'所有IP地址已提取并保存到 {output_file_path}，随机打乱完成')
     except Exception as e:
-        raise RuntimeError(f'写入文件时发生错误: {e}')
+        raise RuntimeError(f'Error writing to file: {e}')
 
 # 获取当前时间
 start_time = datetime.now() + timedelta(hours=8)
@@ -162,7 +162,7 @@ try:
 
     proxy_txt_content_base64 = base64.b64encode(proxy_txt_content.encode()).decode()
 
-    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/11.txt"
+    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
     headers = {
         "Authorization": f"token {github_token}",
     }
