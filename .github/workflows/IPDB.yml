@@ -1,4 +1,4 @@
-name: Update Proxy
+name: Update IPDB
 
 on:
   push:
