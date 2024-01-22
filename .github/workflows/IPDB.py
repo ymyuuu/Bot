@@ -6,11 +6,9 @@ import random
 import base64
 from datetime import datetime, timedelta
 
-# 设置当前工作目录为脚本所在的路径
 script_directory = os.path.dirname(os.path.realpath(__file__))
 os.chdir(script_directory)
 
-# 获取 GitHub secrets
 github_token = os.environ.get("ME_GITHUB_TOKEN", "")
 ipdb_url = os.environ.get("IPDB", "")
 other_url = os.environ.get("OTHER", "")
@@ -47,7 +45,6 @@ def extract_ips_from_file(file_path):
     try:
         with open(file_path, 'r') as file:
             content = file.read()
-            # 使用正则表达式提取IP地址
             ips = re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', content)
             return ips
     except Exception as e:
@@ -61,13 +58,10 @@ def write_ips_to_file(ips, output_file_path):
     except Exception as e:
         raise RuntimeError(f'Error writing to file: {e}')
 
-# 获取当前时间
 start_time = datetime.now() + timedelta(hours=8)
 start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
-# print(f"\n{start_time_str} 正在下载更新的代理IP库...\n")
 print(f"\n{start_time_str} Downloading updated proxy IP library...\n")
 
-# 下载链接 1 的文件，并命名为 1.zip
 url1 = ipdb_url
 filename1 = '1.zip'
 try:
@@ -76,7 +70,6 @@ except RuntimeError as e:
     print(e)
     exit(1)
 
-# 解压 1.zip 到文件夹 1
 extract_folder1 = '1'
 try:
     unzip_file(filename1, extract_folder1)
@@ -84,7 +77,6 @@ except RuntimeError as e:
     print(e)
     exit(1)
 
-# 下载链接 2 的文件，并命名为 2.zip
 url2 = other_url
 filename2 = '2.zip'
 try:
@@ -93,7 +85,6 @@ except RuntimeError as e:
     print(e)
     exit(1)
 
-# 解压 2.zip 到文件夹 2
 extract_folder2 = '2'
 try:
     unzip_file(filename2, extract_folder2)
@@ -101,51 +92,42 @@ except RuntimeError as e:
     print(e)
     exit(1)
 
-# 找到2文件夹里cloudflare-better-ip-main文件夹下的cloudflare文件夹
 cloudflare_folder_path = os.path.join(extract_folder2, 'cloudflare-better-ip-main', 'cloudflare')
 
-# 合并1文件夹里的所有txt文件为all1.txt
 try:
     merge_txt_files('1', 'all1.txt')
 except RuntimeError as e:
     print(e)
     exit(1)
 
-# 合并2文件夹里cloudflare文件夹中的所有txt文件为all2.txt
 try:
     merge_txt_files(cloudflare_folder_path, 'all2.txt')
 except RuntimeError as e:
     print(e)
     exit(1)
 
-# 提取all1.txt中的IP地址，并去重
 try:
     ips_all1 = list(set(extract_ips_from_file('all1.txt')))
 except RuntimeError as e:
     print(e)
     exit(1)
 
-# 提取all2.txt中的IP地址，并去重
 try:
     ips_all2 = list(set(extract_ips_from_file('all2.txt')))
 except RuntimeError as e:
     print(e)
     exit(1)
 
-# 合并两个列表中的IP地址
 all_ips = ips_all1 + ips_all2
 
-# 随机打乱IP地址
 random.shuffle(all_ips)
 
-# 输出到proxy.txt
 try:
     write_ips_to_file(all_ips, 'proxy.txt')
 except RuntimeError as e:
     print(e)
     exit(1)
 
-# GitHub上传代码
 proxy_txt_file_path = "proxy.txt"
 username = "ymyuuu"
 repo_name = "IPDB"
@@ -175,7 +157,7 @@ try:
 
         if response.status_code == 200:
             current_time_str = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-            print(f"{current_time_str} GitHub上proxy.txt文件更新成功!")
+            print(f"{current_time_str} GitHub update successful for proxy.txt file!")
         else:
             print(f"Error uploading file, HTTP status code: {response.status_code}, Error: {response.text}")
             exit(1)
