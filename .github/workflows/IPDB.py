@@ -162,7 +162,7 @@ try:
 
     proxy_txt_content_base64 = base64.b64encode(proxy_txt_content.encode()).decode()
 
-    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
+    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/11.txt"
     headers = {
         "Authorization": f"token {github_token}",
     }
