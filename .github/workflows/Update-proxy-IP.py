@@ -2,99 +2,187 @@ import os
 import requests
 import zipfile
 import re
+import random
 import base64
 from datetime import datetime, timedelta
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(script_dir)
+# 设置当前工作目录为脚本所在的路径
+script_directory = os.path.dirname(os.path.realpath(__file__))
+os.chdir(script_directory)
 
-download_url = os.environ.get("IPDB", "")
-zip_file_name = "data.zip"
-proxy_txt_file_name = "proxy.txt"  # 修改文件名为 proxy.txt
+# 获取 GitHub secrets
+github_token = os.environ.get("ME_GITHUB_TOKEN", "")
+ipdb_url = os.environ.get("IPDB", "")
+other_url = os.environ.get("OTHER", "")
 
-username = "ymyuuu"
-repo_name = "IPDB"
-token = os.environ.get("ME_GITHUB_TOKEN", "")
+def download_file(url, filename):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        with open(filename, 'wb') as file:
+            file.write(response.content)
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f'Error downloading {url}: {e}')
 
+def unzip_file(zip_filename, extract_folder):
+    try:
+        with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
+            zip_ref.extractall(extract_folder)
+    except Exception as e:
+        raise RuntimeError(f'Error unzipping {zip_filename}: {e}')
+
+def merge_txt_files(folder_path, output_filename):
+    try:
+        with open(output_filename, 'w') as output_file:
+            for root, _, files in os.walk(folder_path):
+                for file in files:
+                    if file.endswith('.txt'):
+                        file_path = os.path.join(root, file)
+                        with open(file_path, 'r') as input_file:
+                            output_file.write(input_file.read())
+    except Exception as e:
+        raise RuntimeError(f'Error merging files: {e}')
+
+def extract_ips_from_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            content = file.read()
+            # 使用正则表达式提取IP地址
+            ips = re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', content)
+            return ips
+    except Exception as e:
+        raise RuntimeError(f'Error extracting IP addresses: {e}')
+
+def write_ips_to_file(ips, output_file_path):
+    try:
+        with open(output_file_path, 'w') as output_file:
+            for ip in ips:
+                output_file.write(ip + '\n')
+    except Exception as e:
+        raise RuntimeError(f'Error writing to file: {e}')
+
+# 获取当前时间
 start_time = datetime.now() + timedelta(hours=8)
-
 start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
+# print(f"\n{start_time_str} 正在下载更新的代理IP库...\n")
 print(f"\n{start_time_str} Downloading updated proxy IP library...\n")
 
+# 下载链接 1 的文件，并命名为 1.zip
+url1 = ipdb_url
+filename1 = '1.zip'
 try:
-    response = requests.get(download_url)
-    response.raise_for_status()
-    with open(zip_file_name, "wb") as zip_file:
-        zip_file.write(response.content)
-except requests.exceptions.RequestException as e:
-    print(f"Error downloading ZIP file: {str(e)}")
-    exit()
+    download_file(url1, filename1)
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+# 解压 1.zip 到文件夹 1
+extract_folder1 = '1'
+try:
+    unzip_file(filename1, extract_folder1)
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+# 下载链接 2 的文件，并命名为 2.zip
+url2 = other_url
+filename2 = '2.zip'
+try:
+    download_file(url2, filename2)
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+# 解压 2.zip 到文件夹 2
+extract_folder2 = '2'
+try:
+    unzip_file(filename2, extract_folder2)
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+# 找到2文件夹里cloudflare-better-ip-main文件夹下的cloudflare文件夹
+cloudflare_folder_path = os.path.join(extract_folder2, 'cloudflare-better-ip-main', 'cloudflare')
+
+# 合并1文件夹里的所有txt文件为all1.txt
+try:
+    merge_txt_files('1', 'all1.txt')
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+# 合并2文件夹里cloudflare文件夹中的所有txt文件为all2.txt
+try:
+    merge_txt_files(cloudflare_folder_path, 'all2.txt')
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+# 提取all1.txt中的IP地址，并去重
+try:
+    ips_all1 = list(set(extract_ips_from_file('all1.txt')))
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+# 提取all2.txt中的IP地址，并去重
+try:
+    ips_all2 = list(set(extract_ips_from_file('all2.txt')))
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+# 合并两个列表中的IP地址
+all_ips = ips_all1 + ips_all2
+
+# 随机打乱IP地址
+random.shuffle(all_ips)
+
+# 输出到proxy.txt
+try:
+    write_ips_to_file(all_ips, 'proxy.txt')
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+# GitHub上传代码
+proxy_txt_file_path = "proxy.txt"
+username = "ymyuuu"
+repo_name = "IPDB"
 
 try:
-    with zipfile.ZipFile(zip_file_name, "r") as zip_ref:
-        zip_ref.extractall("data_folder")
-except Exception as e:
-    print(f"Error extracting ZIP file: {str(e)}")
-    exit()
-
-ip_set = set()
-ip_pattern = re.compile(r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b")
-
-for root, _, files in os.walk("data_folder"):
-    for file in files:
-        if file.endswith(".txt"):
-            try:
-                with open(os.path.join(root, file), "r") as txt_file:
-                    for line in txt_file:
-                        line = line.strip()
-                        if line:
-                            matched_ips = ip_pattern.findall(line)
-                            for ip in matched_ips:
-                                parts = ip.split('.')
-                                valid_ip = all(0 <= int(part) <= 255 for part in parts)
-                                if valid_ip:
-                                    ip_set.add(ip)
-            except Exception as e:
-                print(f"Error reading and merging txt files: {str(e)}")
-
-try:
-    with open(proxy_txt_file_name, "w") as new_proxy_file:  # 修改文件名为 proxy.txt
-        for ip in sorted(ip_set, key=lambda x: [int(part) for part in x.split('.')]):
-            new_proxy_file.write(ip + '\n')
-except Exception as e:
-    print(f"Error saving new proxy records: {str(e)}")
-
-try:
-    with open(proxy_txt_file_name, "r") as file:  # 修改文件名为 proxy.txt
+    with open(proxy_txt_file_path, "r") as file:
         proxy_txt_content = file.read()
 
     proxy_txt_content_base64 = base64.b64encode(proxy_txt_content.encode()).decode()
 
-    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/{proxy_txt_file_name}"  # 修改文件名为 proxy.txt
+    get_sha_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
     headers = {
-        "Authorization": f"token {token}",
+        "Authorization": f"token {github_token}",
     }
     sha_response = requests.get(get_sha_url, headers=headers)
 
     if sha_response.status_code == 200:
         current_sha = sha_response.json().get("sha", "")
         data = {
-            "message": f"Updated {proxy_txt_file_name} - {start_time_str} (Total IPs: {len(ip_set)})",
+            "message": f"Update proxy.txt - {start_time_str} (Total IPs: {len(proxy_txt_content.splitlines())})",
             "content": proxy_txt_content_base64,
             "sha": current_sha,
         }
 
-        upload_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/{proxy_txt_file_name}"  # 修改文件名为 proxy.txt
-
+        upload_url = f"https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
         response = requests.put(upload_url, headers=headers, json=data)
 
         if response.status_code == 200:
             current_time_str = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-            print(f"{current_time_str} Successfully updated {proxy_txt_file_name} file on GitHub!")
+            print(f"{current_time_str} GitHub上proxy.txt文件更新成功!")
         else:
-            print(f"Failed to upload file, HTTP status code: {response.status_code}, Error: {response.text}")
+            print(f"Error uploading file, HTTP status code: {response.status_code}, Error: {response.text}")
+            exit(1)
     else:
-        print(f"Failed to get current {proxy_txt_file_name}'s SHA: {sha_response.text}")
+        print(f"Failed to get current proxy.txt SHA value: {sha_response.text}")
+        exit(1)
 
 except Exception as e:
     print(f"Error uploading file to GitHub: {str(e)}")
+    exit(1)
