@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 def get_ip_info(ip, session, output_path, asn_set):
     try:
-        response = session.get(f"https://ipinfo.io/{ip}?token=8bedced47027a8", timeout=1)
+        response = session.get(f"https://ipinfo.io/{ip}?token=6683ed526c919a", timeout=1)
         data = response.json()
 
         asn_match = re.match(r"AS(\d+)", data.get('org', 'N/A'))
@@ -45,13 +45,13 @@ def scan_and_send_files(url, filename_prefix, additional_text=None, parse_mode='
 proxy_url = "https://ipdb.api.030101.xyz/?type=proxy"
 best_proxy_url = "https://ipdb.api.030101.xyz/?type=bestproxy"
 best_cf_url = "https://ipdb.api.030101.xyz/?type=bestcf"
-bot_token = os.environ.get('BOT_TOKEN')
-chat_id = os.environ.get('CHAT_ID')
+bot_token = os.environ.get('BOT_TOKEN')  # Read from environment variable
+chat_id = os.environ.get('CHAT_ID')      # Read from environment variable
 
 output_path = os.path.dirname(os.path.realpath(__file__))
 
 try:
-    start_time = datetime.now() + timedelta(hours=8) 
+    start_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
     send_notification(f"Scan *start* at *{start_time:%Y-%m-%d %H:%M}*", parse_mode='Markdown')
     print(f"Scan start at {start_time:%Y-%m-%d %H:%M}")
 
@@ -66,8 +66,8 @@ try:
     for asn in unique_asns:
         send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
-    scan_and_send_files(best_cf_url, "BestCF", additional_text="`bestcf.onecf.eu.org`", parse_mode='MarkdownV2')
-    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="`bestproxy.onecf.eu.org`", parse_mode='MarkdownV2')
+    scan_and_send_files(best_cf_url, "BestCF", additional_text="*bestcfaaa.com*", parse_mode='MarkdownV2')
+    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="`abcd.ooo.cvn`", parse_mode='MarkdownV2')
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
