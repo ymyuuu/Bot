@@ -57,9 +57,6 @@ try:
     with requests.Session() as session, ThreadPoolExecutor(max_workers=100) as executor:
         executor.map(lambda ip: get_ip_info(ip, session, output_path, unique_asns), proxy_data)
 
-    for asn in unique_asns:
-        send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
-
     best_proxy_data = requests.get(best_proxy_url).text.strip().split('\n')
     with open(os.path.join(output_path, "BestProxy.txt"), 'w') as best_proxy_file:
         best_proxy_file.write("\n".join(best_proxy_data))
@@ -68,14 +65,13 @@ try:
     with open(os.path.join(output_path, "BestCF.txt"), 'w') as best_cf_file:
         best_cf_file.write("\n".join(best_cf_data))
 
-    end_time = datetime.now() + timedelta(hours=8)
-    duration = (end_time - start_time).total_seconds()
-    scan_message = f"Scan over at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s"
-    send_notification(scan_message)
-    print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
-
     send_to_telegram(os.path.join(output_path, "BestProxy.txt"))
     send_to_telegram(os.path.join(output_path, "BestCF.txt"), additional_text="BestCF.txt is ok")
+
+    end_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
+    duration = (end_time - start_time).total_seconds()
+    send_notification(f"Scan over at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s")
+    print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
 
 except requests.RequestException:
     pass
