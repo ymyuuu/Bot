@@ -12,7 +12,7 @@ def get_ip_info(ip, session, output_path, asn_set):
         asn_match = re.match(r"AS(\d+)", data.get('org', 'N/A'))
         asn = asn_match.group(1) if asn_match else 'N/A'
         
-        with open(os.path.join(output_path, f"ASN{asn}.txt")， 'a') as file:
+        with open(os.path.join(output_path, f"ASN{asn}.txt"), 'a') as file:
             file.write(f"{ip}\n")
 
         asn_set.add(asn)
@@ -51,8 +51,8 @@ try:
         executor.map(lambda ip: get_ip_info(ip, session, output_path, unique_asns), proxy_data)
     
     best_proxy_data = requests.get(best_proxy_url).text.strip().split('\n')
-    with open(os.path.join(output_path, "BestProxy.txt")， 'w') as best_proxy_file:
-        best_proxy_file.write("\n"。join(best_proxy_data))
+    with open(os.path.join(output_path, "BestProxy.txt"), 'w') as best_proxy_file:
+        best_proxy_file.write("\n".join(best_proxy_data))
 
     [send_to_telegram(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith("ASN") and filename.endswith(".txt")]
 
