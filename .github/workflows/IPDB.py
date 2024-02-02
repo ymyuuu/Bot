@@ -1,66 +1,171 @@
-import requests
-import re
 import os
-from concurrent.futures import ThreadPoolExecutor
+import requests
+import zipfile
+import re
+import random
+import base64
 from datetime import datetime, timedelta
 
-def get_ip_info(ip, session, output_path, asn_set):
+script_directory = os.path.dirname(os.path.realpath(__file__))
+os.chdir(script_directory)
+
+github_token = os.environ.get("ME_GITHUB_TOKEN", "")
+ipdb_url = os.environ.get("IPDB", "")
+other_url = os.environ.get("OTHER", "")
+
+def download_file(url, filename):
     try:
-        response = session.get(f"https://ipinfo.io/{ip}?token=6683ed526c919a", timeout=1)
-        data = response.json()
+        response = requests.get(url)
+        response.raise_for_status()
+        with open(filename, 'wb') as file:
+            file.write(response.content)
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f'Error downloading {url}: {e}')
 
-        asn_match = re.match(r"AS(\d+)", data.get('org', 'N/A'))
-        asn = asn_match.group(1) if asn_match else 'N/A'
-        
-        with open(os.path.join(output_path, f"ASN{asn}.txt"), 'a') as file:
-            file.write(f"{ip}\n")
+def unzip_file(zip_filename, extract_folder):
+    try:
+        with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
+            zip_ref.extractall(extract_folder)
+    except Exception as e:
+        raise RuntimeError(f'Error unzipping {zip_filename}: {e}')
 
-        asn_set.add(asn)
-        
-    except requests.RequestException:
-        pass
+def merge_txt_files(folder_path, output_filename):
+    try:
+        with open(output_filename, 'w') as output_file:
+            for root, _, files in os.walk(folder_path):
+                for file in files:
+                    if file.endswith('.txt'):
+                        file_path = os.path.join(root, file)
+                        with open(file_path, 'r') as input_file:
+                            output_file.write(input_file.read())
+    except Exception as e:
+        raise RuntimeError(f'Error merging files: {e}')
 
-def send_to_telegram(file_path):
-    with open(file_path, 'rb') as file:
-        requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files={'document': file}, params={'chat_id': chat_id})
+def extract_ips_from_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            content = file.read()
+            ips = re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', content)
+            return ips
+    except Exception as e:
+        raise RuntimeError(f'Error extracting IP addresses: {e}')
 
-def clear_files():
-    [os.remove(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith("ASN") and filename.endswith(".txt")]
+def write_ips_to_file(ips, output_file_path):
+    try:
+        with open(output_file_path, 'w') as output_file:
+            for ip in ips:
+                output_file.write(ip + '\n')
+    except Exception as e:
+        raise RuntimeError(f'Error writing to file: {e}')
 
-def send_notification(message_text):
-    requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': 'Markdown'})
+start_time = datetime.now() + timedelta(hours=8)
+start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
+print(f"\n{start_time_str} Downloading updated proxy IP library...\n")
 
-proxy_url = "https://ipdb.api.030101.xyz/?type=proxy"
-best_proxy_url = "https://ipdb.api.030101.xyz/?type=bestproxy"
-bot_token = os.environ.get('BOT_TOKEN')  # Read from environment variable
-chat_id = os.environ.get('CHAT_ID')      # Read from environment variable
+url1 = ipdb_url
+filename1 = '1.zip'
+try:
+    download_file(url1, filename1)
+except RuntimeError as e:
+    print(e)
+    exit(1)
 
-output_path = os.path.dirname(os.path.realpath(__file__))
+extract_folder1 = '1'
+try:
+    unzip_file(filename1, extract_folder1)
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+url2 = other_url
+filename2 = '2.zip'
+try:
+    download_file(url2, filename2)
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+extract_folder2 = '2'
+try:
+    unzip_file(filename2, extract_folder2)
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+cloudflare_folder_path = os.path.join(extract_folder2, 'cloudflare-better-ip-main', 'cloudflare')
 
 try:
-    start_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
-    send_notification(f"Scan start at *{start_time:%Y-%m-%d %H:%M}*")
-    print(f"Scan start at {start_time:%Y-%m-%d %H:%M}")
+    merge_txt_files('1', 'all1.txt')
+except RuntimeError as e:
+    print(e)
+    exit(1)
 
-    clear_files()
+try:
+    merge_txt_files(cloudflare_folder_path, 'all2.txt')
+except RuntimeError as e:
+    print(e)
+    exit(1)
 
-    unique_asns = set()
-    proxy_data = requests.get(proxy_url).text.strip().split('\n')
+try:
+    ips_all1 = list(set(extract_ips_from_file('all1.txt')))
+except RuntimeError as e:
+    print(e)
+    exit(1)
 
-    with requests.Session() as session, ThreadPoolExecutor(max_workers=100) as executor:
-        executor.map(lambda ip: get_ip_info(ip, session, output_path, unique_asns), proxy_data)
-    
-    best_proxy_data = requests.get(best_proxy_url).text.strip().split('\n')
-    with open(os.path.join(output_path, "BestProxy.txt"), 'w') as best_proxy_file:
-        best_proxy_file.write("\n".join(best_proxy_data))
+try:
+    ips_all2 = list(set(extract_ips_from_file('all2.txt')))
+except RuntimeError as e:
+    print(e)
+    exit(1)
 
-    [send_to_telegram(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith("ASN") and filename.endswith(".txt")]
+all_ips = ips_all1 + ips_all2
 
-    end_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
-    duration = (end_time - start_time).total_seconds()
-    send_notification(f"Scan over at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s")
-    print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
-    send_to_telegram(os.path.join(output_path, "BestProxy.txt"))
+random.shuffle(all_ips)
 
-except requests.RequestException:
-    pass
+try:
+    write_ips_to_file(all_ips, 'proxy.txt')
+except RuntimeError as e:
+    print(e)
+    exit(1)
+
+proxy_txt_file_path = "proxy.txt"
+username = "ymyuuu"
+repo_name = "IPDB"
+
+try:
+    with open(proxy_txt_file_path, "r") as file:
+        proxy_txt_content = file.read()
+
+    proxy_txt_content_base64 = base64.b64encode(proxy_txt_content.encode()).decode()
+
+    get_sha_url = f"https://proxy.api.030101.xyz/https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
+    headers = {
+        "Authorization": f"token {github_token}",
+    }
+    sha_response = requests.get(get_sha_url, headers=headers)
+
+    if sha_response.status_code == 200:
+        current_sha = sha_response.json().get("sha", "")
+        data = {
+            "message": f"Update proxy.txt - {start_time_str} (Total IPs: {len(proxy_txt_content.splitlines())})",
+            "content": proxy_txt_content_base64,
+            "sha": current_sha,
+        }
+
+        upload_url = f"https://proxy.api.030101.xyz/https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
+        response = requests.put(upload_url, headers=headers, json=data)
+
+        if response.status_code == 200:
+            current_time_str = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+            print(f"{current_time_str} GitHub update successful for proxy.txt file!")
+        else:
+            print(f"Error uploading file, HTTP status code: {response.status_code}, Error: {response.text}")
+            exit(1)
+    else:
+        print(f"Failed to get current proxy.txt SHA value: {sha_response.text}")
+        exit(1)
+
+except Exception as e:
+    print(f"Error uploading file to GitHub: {str(e)}")
+    exit(1)
+# https://chat.openai.com/share/1688b20a-8734-4582-b641-2e285841d35d
