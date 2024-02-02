@@ -22,12 +22,13 @@ def get_ip_info(ip, session, output_path, asn_set):
 
 def send_to_telegram(file_path, additional_text=None):
     with open(file_path, 'rb') as file:
-        files = {'document': file}
+        files = {'document': (file_path, file, 'rb')}
 
         if additional_text:
-            files['caption'] = additional_text
-
-        requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files=files, params={'chat_id': chat_id, 'parse_mode': 'Markdown'})
+            data = {'caption': additional_text, 'chat_id': chat_id, 'parse_mode': 'Markdown'}
+            requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files=files, data=data)
+        else:
+            requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files=files, params={'chat_id': chat_id, 'parse_mode': 'Markdown'})
 
 def clear_files():
     [os.remove(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith(("ASN", "Best")) and filename.endswith(".txt")]
@@ -55,7 +56,7 @@ try:
 
     with requests.Session() as session, ThreadPoolExecutor(max_workers=100) as executor:
         executor.map(lambda ip: get_ip_info(ip, session, output_path, unique_asns), proxy_data)
-    
+
     best_proxy_data = requests.get(best_proxy_url).text.strip().split('\n')
     with open(os.path.join(output_path, "BestProxy.txt"), 'w') as best_proxy_file:
         best_proxy_file.write("\n".join(best_proxy_data))
