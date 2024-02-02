@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 def get_ip_info(ip, session, output_path, asn_set):
     try:
-        response = session.get(f"https://ipinfo.io/{ip}?token=8bedced47027a8", timeout=1)
+        response = session.get(f"https://ipinfo.io/{ip}?token=6683ed526c919a", timeout=1)
         data = response.json()
 
         asn_match = re.match(r"AS(\d+)", data.get('org', 'N/A'))
@@ -36,11 +36,15 @@ def clear_files():
 def send_notification(message_text):
     requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': 'Markdown'})
 
-def scan_and_send_files(url, filename_prefix):
+def scan_and_send_files(url, filename_prefix, additional_text=None):
     data = requests.get(url).text.strip().split('\n')
     with open(os.path.join(output_path, f"{filename_prefix}.txt"), 'w') as file:
         file.write("\n".join(data))
-    send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"), additional_text=f"{filename_prefix}.txt is ok")
+    
+    if additional_text:
+        send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"), additional_text=additional_text)
+    else:
+        send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"))
 
 proxy_url = "https://ipdb.api.030101.xyz/?type=proxy"
 best_proxy_url = "https://ipdb.api.030101.xyz/?type=bestproxy"
@@ -67,7 +71,7 @@ try:
         send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
     scan_and_send_files(best_proxy_url, "BestProxy")
-    scan_and_send_files(best_cf_url, "BestCF")
+    scan_and_send_files(best_cf_url, "BestCF", additional_text="[bestcf.onecf.eu.org](https://bestcf.onecf.eu.org)")
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
