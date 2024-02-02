@@ -57,6 +57,9 @@ try:
     with requests.Session() as session, ThreadPoolExecutor(max_workers=100) as executor:
         executor.map(lambda ip: get_ip_info(ip, session, output_path, unique_asns), proxy_data)
 
+    for asn in unique_asns:
+        send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
+
     best_proxy_data = requests.get(best_proxy_url).text.strip().split('\n')
     with open(os.path.join(output_path, "BestProxy.txt"), 'w') as best_proxy_file:
         best_proxy_file.write("\n".join(best_proxy_data))
