@@ -32,9 +32,8 @@ def send_notification(message_text):
     requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': 'Markdown'})
 
 def convert_to_beijing_time(utc_time):
-    utc = pytz.utc.localize(utc_time)
     beijing_tz = pytz.timezone('Asia/Shanghai')
-    beijing_time = utc.astimezone(beijing_tz)
+    beijing_time = utc_time.astimezone(beijing_tz)
     return beijing_time
 
 proxy_url = "https://ipdb.api.030101.xyz/?type=proxy"
