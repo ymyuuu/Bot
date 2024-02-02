@@ -20,9 +20,12 @@ def get_ip_info(ip, session, output_path, asn_set):
     except requests.RequestException:
         pass
 
-def send_to_telegram(file_path):
+def send_to_telegram(file_path, additional_text=None):
     with open(file_path, 'rb') as file:
         requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files={'document': file}, params={'chat_id': chat_id})
+
+    if additional_text:
+        requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': additional_text, 'parse_mode': 'Markdown'})
 
 def clear_files():
     [os.remove(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith(("ASN", "Best")) and filename.endswith(".txt")]
@@ -58,16 +61,14 @@ try:
     best_cf_data = requests.get(best_cf_url).text.strip().split('\n')
     with open(os.path.join(output_path, "BestCF.txt"), 'w') as best_cf_file:
         best_cf_file.write("\n".join(best_cf_data))
-        best_cf_file.write("\nBestCF.txt is ok")  # Add the description text
 
-    [send_to_telegram(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith(("ASN", "Best")) and filename.endswith(".txt")]
+    send_to_telegram(os.path.join(output_path, "BestProxy.txt"))
+    send_to_telegram(os.path.join(output_path, "BestCF.txt"), additional_text="BestCF.txt is ok")
 
     end_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
     duration = (end_time - start_time).total_seconds()
     send_notification(f"Scan over at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s")
     print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
-    send_to_telegram(os.path.join(output_path, "BestProxy.txt"))
-    send_to_telegram(os.path.join(output_path, "BestCF.txt"))
 
 except requests.RequestException:
     pass
