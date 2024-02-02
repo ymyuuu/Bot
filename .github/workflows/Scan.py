@@ -22,10 +22,12 @@ def get_ip_info(ip, session, output_path, asn_set):
 
 def send_to_telegram(file_path, additional_text=None):
     with open(file_path, 'rb') as file:
-        requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files={'document': file}, params={'chat_id': chat_id})
+        files = {'document': file}
 
-    if additional_text:
-        requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': additional_text, 'parse_mode': 'Markdown'})
+        if additional_text:
+            files['caption'] = additional_text
+
+        requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files=files, params={'chat_id': chat_id, 'parse_mode': 'Markdown'})
 
 def clear_files():
     [os.remove(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith(("ASN", "Best")) and filename.endswith(".txt")]
