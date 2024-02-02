@@ -24,17 +24,23 @@ def send_to_telegram(file_path, additional_text=None):
     with open(file_path, 'rb') as file:
         files = {'document': (file_path, file, 'rb')}
 
+        data = {'chat_id': chat_id, 'parse_mode': 'Markdown'}
         if additional_text:
-            data = {'caption': additional_text, 'chat_id': chat_id, 'parse_mode': 'Markdown'}
-            requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files=files, data=data)
-        else:
-            requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files=files, params={'chat_id': chat_id, 'parse_mode': 'Markdown'})
+            data['caption'] = additional_text
+
+        requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files=files, data=data)
 
 def clear_files():
     [os.remove(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith(("ASN", "Best")) and filename.endswith(".txt")]
 
 def send_notification(message_text):
     requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': 'Markdown'})
+
+def scan_and_send_files(url, filename_prefix):
+    data = requests.get(url).text.strip().split('\n')
+    with open(os.path.join(output_path, f"{filename_prefix}.txt"), 'w') as file:
+        file.write("\n".join(data))
+    send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"), additional_text=f"{filename_prefix}.txt is ok")
 
 proxy_url = "https://ipdb.api.030101.xyz/?type=proxy"
 best_proxy_url = "https://ipdb.api.030101.xyz/?type=bestproxy"
@@ -57,20 +63,16 @@ try:
     with requests.Session() as session, ThreadPoolExecutor(max_workers=100) as executor:
         executor.map(lambda ip: get_ip_info(ip, session, output_path, unique_asns), proxy_data)
 
-    best_proxy_data = requests.get(best_proxy_url).text.strip().split('\n')
-    with open(os.path.join(output_path, "BestProxy.txt"), 'w') as best_proxy_file:
-        best_proxy_file.write("\n".join(best_proxy_data))
+    for asn in unique_asns:
+        send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
-    best_cf_data = requests.get(best_cf_url).text.strip().split('\n')
-    with open(os.path.join(output_path, "BestCF.txt"), 'w') as best_cf_file:
-        best_cf_file.write("\n".join(best_cf_data))
+    scan_and_send_files(best_proxy_url, "BestProxy")
+    scan_and_send_files(best_cf_url, "BestCF")
 
-    send_to_telegram(os.path.join(output_path, "BestProxy.txt"))
-    send_to_telegram(os.path.join(output_path, "BestCF.txt"), additional_text="BestCF.txt is ok")
-
-    end_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
+    end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
-    send_notification(f"Scan over at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s")
+    scan_message = f"Scan over at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s"
+    send_notification(scan_message)
     print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
 
 except requests.RequestException:
