@@ -24,7 +24,7 @@ def send_to_telegram(file_path, additional_text=None, parse_mode='MarkdownV2'):
     with open(file_path, 'rb') as file:
         files = {'document': (file_path, file, 'rb')}
 
-        data = {'chat_id': chat_id, 'parse_mode': parse_mode}
+        data = {'chat_id': chat_id, 'parse_mode': parse_mode, 'disable_notification': True}
         if additional_text:
             data['caption'] = additional_text
 
@@ -34,7 +34,7 @@ def clear_files():
     [os.remove(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith(("ASN", "Best")) and filename.endswith(".txt")]
 
 def send_notification(message_text, parse_mode='MarkdownV2'):
-    requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': parse_mode})
+    requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': parse_mode, 'disable_notification': True})
 
 def scan_and_send_files(url, filename_prefix, additional_text=None, parse_mode='MarkdownV2'):
     data = requests.get(url).text.strip()
