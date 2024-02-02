@@ -52,7 +52,7 @@ output_path = os.path.dirname(os.path.realpath(__file__))
 
 try:
     start_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
-    send_notification(f"Scan start at *{start_time:%Y-%m-%d %H:%M}*")
+    send_notification(f"Scan start at `{start_time:%Y-%m-%d %H:%M}`")
     print(f"Scan start at {start_time:%Y-%m-%d %H:%M}")
 
     clear_files()
@@ -71,7 +71,7 @@ try:
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
-    scan_message = f"Scan over at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s"
+    scan_message = f"Scan over at `{end_time:%Y-%m-%d %H:%M}`\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s"
     send_notification(scan_message)
     print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
 
