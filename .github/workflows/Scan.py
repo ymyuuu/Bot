@@ -37,15 +37,10 @@ def send_notification(message_text):
     requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': 'MarkdownV2'})
 
 def scan_and_send_files(url, filename_prefix, additional_text=None):
-    data = requests.get(url).text.strip().split('\n')
+    data = requests.get(url).text.strip()
     with open(os.path.join(output_path, f"{filename_prefix}.txt"), 'w') as file:
-        file.write("\n".join(data))
-
+        file.write(data)
     send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"), additional_text=additional_text)
-
-def scan_and_send_asn_files(asn_set):
-    for asn in asn_set:
-        send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
 proxy_url = "https://ipdb.api.030101.xyz/?type=proxy"
 best_proxy_url = "https://ipdb.api.030101.xyz/?type=bestproxy"
@@ -68,9 +63,11 @@ try:
     with requests.Session() as session, ThreadPoolExecutor(max_workers=100) as executor:
         executor.map(lambda ip: get_ip_info(ip, session, output_path, unique_asns), proxy_data)
 
-    scan_and_send_asn_files(unique_asns)
-    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="abcd.ooo.cvn")
-    scan_and_send_files(best_cf_url, "BestCF", additional_text="bestcfaaa.com")
+    for asn in unique_asns:
+        send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
+
+    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="`abcd.ooo.cvn`")
+    scan_and_send_files(best_cf_url, "BestCF", additional_text="`bestcfaaa.com`")
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
