@@ -71,7 +71,7 @@ try:
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
-    scan_message = f"Scan *over* at **{end_time:%Y-%m-%d %H:%M}**\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s"
+    scan_message = f"Scan *over* at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s"
     send_notification(scan_message, parse_mode='Markdown')
     print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
 
