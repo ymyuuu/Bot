@@ -52,7 +52,7 @@ output_path = os.path.dirname(os.path.realpath(__file__))
 
 try:
     start_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
-    send_notification(f"Scan *start* at **{start_time:%Y-%m-%d %H:%M}**")
+    send_notification(f"Scan *start* at _{start_time:%Y-%m-%d %H:%M}_")
     print(f"Scan start at {start_time:%Y-%m-%d %H:%M}")
 
     clear_files()
