@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 def get_ip_info(ip, session, output_path, asn_set):
     try:
-        response = session.get(f"https://ipinfo.io/{ip}?token=6683ed526c919a", timeout=1)
+        response = session.get(f"https://ipinfo.io/{ip}?token=8bedced47027a8", timeout=1)
         data = response.json()
 
         asn_match = re.match(r"AS(\d+)", data.get('org', 'N/A'))
@@ -52,7 +52,7 @@ output_path = os.path.dirname(os.path.realpath(__file__))
 
 try:
     start_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
-    send_notification(f"Scan *start* at **{start_time:%Y-%m-%d %H:%M}**", parse_mode='Markdown')
+    send_notification(f"Scan *start* at *{start_time:%Y-%m-%d %H:%M}*", parse_mode='Markdown')
     print(f"Scan start at {start_time:%Y-%m-%d %H:%M}")
 
     clear_files()
@@ -66,12 +66,12 @@ try:
     for asn in unique_asns:
         send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
-    scan_and_send_files(best_cf_url, "BestCF", additional_text="*bestcfaaa.com*", parse_mode='MarkdownV2')
-    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="`abcd.ooo.cvn`", parse_mode='MarkdownV2')
+    scan_and_send_files(best_cf_url, "BestCF", additional_text="`bestcf.eu.org`", parse_mode='MarkdownV2')
+    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="`bestproxy.eu.org`", parse_mode='MarkdownV2')
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
-    scan_message = f"Scan *over* at **{end_time:%Y-%m-%d %H:%M}**\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s"
+    scan_message = f"Scan *over* at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s"
     send_notification(scan_message, parse_mode='Markdown')
     print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
 
