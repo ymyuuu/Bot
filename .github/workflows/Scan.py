@@ -2,7 +2,7 @@ import requests
 import re
 import os
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def get_ip_info(ip, session, output_path, asn_set):
     try:
@@ -38,7 +38,7 @@ chat_id = os.environ.get('CHAT_ID')      # Read from environment variable
 output_path = os.path.dirname(os.path.realpath(__file__))
 
 try:
-    start_time = datetime.now()
+    start_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
     send_notification(f"Scan start at *{start_time:%Y-%m-%d %H:%M}*")
     print(f"Scan start at {start_time:%Y-%m-%d %H:%M}")
 
@@ -56,7 +56,7 @@ try:
 
     [send_to_telegram(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith("ASN") and filename.endswith(".txt")]
 
-    end_time = datetime.now()
+    end_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
     duration = (end_time - start_time).total_seconds()
     send_notification(f"Scan over at *{end_time:%Y-%m-%d %H:%M}*\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s")
     print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
