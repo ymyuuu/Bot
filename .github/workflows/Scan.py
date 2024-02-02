@@ -40,10 +40,6 @@ def scan_and_send_files(url, filename_prefix, additional_text=None):
     data = requests.get(url).text.strip()
     with open(os.path.join(output_path, f"{filename_prefix}.txt"), 'w') as file:
         file.write(data)
-    
-    if additional_text:
-        additional_text = f"`{additional_text}`"
-    
     send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"), additional_text=additional_text)
 
 proxy_url = "https://ipdb.api.030101.xyz/?type=proxy"
@@ -56,7 +52,7 @@ output_path = os.path.dirname(os.path.realpath(__file__))
 
 try:
     start_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
-    send_notification(f"Scan start at *{start_time:%Y-%m-%d %H:%M}*")
+    send_notification(f"Scan start at ``{start_time:%Y-%m-%d %H:%M}``")
     print(f"Scan start at {start_time:%Y-%m-%d %H:%M}")
 
     clear_files()
@@ -70,8 +66,8 @@ try:
     for asn in unique_asns:
         send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
-    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="abcd.ooo.cvn")
-    scan_and_send_files(best_cf_url, "BestCF", additional_text="bestcfaaa.com")
+    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="`abcd.ooo.cvn`")
+    scan_and_send_files(best_cf_url, "BestCF", additional_text="`bestcfaaa.com`")
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
