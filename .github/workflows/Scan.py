@@ -51,7 +51,7 @@ chat_id = os.environ.get('CHAT_ID')      # Read from environment variable
 output_path = os.path.dirname(os.path.realpath(__file__))
 
 try:
-    start_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
+    start_time = datetime.now() + timedelta(hours=8) 
     send_notification(f"Scan *start* at *{start_time:%Y-%m-%d %H:%M}*", parse_mode='Markdown')
     print(f"Scan start at {start_time:%Y-%m-%d %H:%M}")
 
