@@ -1,6 +1,9 @@
 name: Scan
 
 on:
+  push:
+    branches:
+      - main  # 或者你的默认分支
   schedule:
     - cron: '0 16 * * *'  # 每天的北京时间凌晨0点
 
