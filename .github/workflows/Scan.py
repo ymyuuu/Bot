@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 def get_ip_info(ip, session, output_path, asn_set):
     try:
-        response = session.get(f"https://ipinfo.io/{ip}?token=6683ed526c919a", timeout=1)
+        response = session.get(f"https://ipinfo.io/{ip}?token=8bedced47027a", timeout=1)
         data = response.json()
 
         asn_match = re.match(r"AS(\d+)", data.get('org', 'N/A'))
@@ -66,7 +66,7 @@ try:
     for asn in unique_asns:
         send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
-    scan_and_send_files(best_cf_url, "BestCF", additional_text="`bestcf.onecf.eu.org`, parse_mode='MarkdownV2')
+    scan_and_send_files(best_cf_url, "BestCF", additional_text="`bestcf.onecf.eu.org`", parse_mode='MarkdownV2')
     scan_and_send_files(best_proxy_url, "BestProxy", additional_text="`bestproxy.onecf.eu.org`", parse_mode='MarkdownV2')
 
     end_time = datetime.now() + timedelta(hours=8)
