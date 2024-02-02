@@ -52,7 +52,7 @@ output_path = os.path.dirname(os.path.realpath(__file__))
 
 try:
     start_time = datetime.now() + timedelta(hours=8)  # Add 8 hours for Beijing time
-    send_notification(f"Scan *start* at *{start_time:%Y-%m-%d %H:%M}*", parse_mode='Markdown')
+    send_notification(f"Scan *start* at **{start_time:%Y-%m-%d %H:%M}**", parse_mode='Markdown')
     print(f"Scan start at {start_time:%Y-%m-%d %H:%M}")
 
     clear_files()
@@ -66,8 +66,8 @@ try:
     for asn in unique_asns:
         send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
-    scan_and_send_files(best_cf_url, "BestCF", additional_text="*bestcfaaa.com*", parse_mode='MarkdownV2')
     scan_and_send_files(best_proxy_url, "BestProxy", additional_text="`abcd.ooo.cvn`", parse_mode='MarkdownV2')
+    scan_and_send_files(best_cf_url, "BestCF", additional_text="*bestcfaaa.com*", parse_mode='MarkdownV2')
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
