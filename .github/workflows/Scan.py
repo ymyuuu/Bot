@@ -45,8 +45,8 @@ def scan_and_send_files(url, filename_prefix, additional_text=None, parse_mode='
 proxy_url = "https://ipdb.api.030101.xyz/?type=proxy"
 best_proxy_url = "https://ipdb.api.030101.xyz/?type=bestproxy"
 best_cf_url = "https://ipdb.api.030101.xyz/?type=bestcf"
-bot_token = os.environ.get('BOT_TOKEN')  # Read from environment variable
-chat_id = os.environ.get('CHAT_ID')      # Read from environment variable
+bot_token = os.environ.get('BOT_TOKEN')
+chat_id = os.environ.get('CHAT_ID')
 
 output_path = os.path.dirname(os.path.realpath(__file__))
 
