@@ -26,6 +26,7 @@ def send_to_telegram(file_path, additional_text=None):
 
         data = {'chat_id': chat_id, 'parse_mode': 'MarkdownV2'}
         if additional_text:
+            additional_text = f"`{additional_text}`"
             data['caption'] = additional_text
 
         requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files=files, data=data)
@@ -38,6 +39,12 @@ def send_notification(message_text):
 
 def scan_and_send_files(url, filename_prefix, additional_text=None):
     data = requests.get(url).text.strip().split('\n')
+    with open(os.path.join(output_path, f"{filename_prefix}.txt"), 'w') as file:
+        file.write("\n".join(data))
+    send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"), additional_text=additional_text)
+
+def perform_scan(scan_url, filename_prefix, additional_text=None):
+    data = requests.get(scan_url).text.strip().split('\n')
     with open(os.path.join(output_path, f"{filename_prefix}.txt"), 'w') as file:
         file.write("\n".join(data))
     send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"), additional_text=additional_text)
@@ -66,8 +73,8 @@ try:
     for asn in unique_asns:
         send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
-    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="今天天气很好")
-    scan_and_send_files(best_cf_url, "BestCF", additional_text="你好呀")
+    perform_scan(best_cf_url, "BestCF", additional_text="你好呀")
+    perform_scan(best_proxy_url, "BestProxy", additional_text="今天天气很好")
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
