@@ -71,8 +71,9 @@ try:
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
-    scan_message = f"Scan *over* at **{end_time:%Y-%m-%d %H:%M}**\nIPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s\n[APIEnlightenX](https://api.030101.xyz?disable_web_page_preview=true) And [GitHub](https://github.com/ymyuuu?disable_web_page_preview=true) And [Blog](https://onecn.eu.org?disable_web_page_preview=true)"
-    send_notification(scan_message, parse_mode='Markdown')
+    scan_message = f"Scan *over* at **{end_time:%Y-%m-%d %H:%M}** IPs: {len(proxy_data)}, ASNs: {len(unique_asns)}, Lasted for {duration:.2f}s <a href='https://api.030101.xyz'>API</a> <a href='https://github.com/ymyuuu'>GitHub</a> <a href='https://onecn.eu.org'>Blog</a>"
+    send_notification(scan_message, parse_mode='HTML')
+    # send_notification(scan_message, parse_mode='Markdown')
     print(f"Scan over at {end_time:%Y-%m-%d %H:%M}")
 
 except requests.RequestException:
