@@ -24,7 +24,7 @@ def send_to_telegram(file_path, additional_text=None):
     with open(file_path, 'rb') as file:
         files = {'document': (file_path, file, 'rb')}
 
-        data = {'chat_id': chat_id, 'parse_mode': 'Markdown'}
+        data = {'chat_id': chat_id, 'parse_mode': 'MarkdownV2'}
         if additional_text:
             data['caption'] = additional_text
 
@@ -34,17 +34,13 @@ def clear_files():
     [os.remove(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith(("ASN", "Best")) and filename.endswith(".txt")]
 
 def send_notification(message_text):
-    requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': 'Markdown'})
+    requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': 'MarkdownV2'})
 
-def scan_and_send_files(url, filename_prefix, additional_text=None):
+def scan_and_send_files(url, filename_prefix):
     data = requests.get(url).text.strip().split('\n')
     with open(os.path.join(output_path, f"{filename_prefix}.txt"), 'w') as file:
         file.write("\n".join(data))
-    
-    if additional_text:
-        send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"), additional_text=additional_text)
-    else:
-        send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"))
+    send_to_telegram(os.path.join(output_path, f"{filename_prefix}.txt"), additional_text=f"`{filename_prefix}.txt` is ok")
 
 proxy_url = "https://ipdb.api.030101.xyz/?type=proxy"
 best_proxy_url = "https://ipdb.api.030101.xyz/?type=bestproxy"
@@ -71,7 +67,7 @@ try:
         send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
     scan_and_send_files(best_proxy_url, "BestProxy")
-    scan_and_send_files(best_cf_url, "BestCF", additional_text="[bestcf.onecf.eu.org](https://bestcf.onecf.eu.org)")
+    scan_and_send_files(best_cf_url, "BestCF")
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
