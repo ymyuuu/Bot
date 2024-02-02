@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 def get_ip_info(ip, session, output_path, asn_set):
     try:
-        response = session.get(f"https://ipinfo.io/{ip}?token=294becce387951", timeout=1)
+        response = session.get(f"https://proxy.api.030101.xyz/https://ipinfo.io/{ip}?token=294becce387951", timeout=1)
         data = response.json()
 
         asn_match = re.match(r"AS(\d+)", data.get('org', 'N/A'))
@@ -28,13 +28,13 @@ def send_to_telegram(file_path, additional_text=None, parse_mode='MarkdownV2'):
         if additional_text:
             data['caption'] = additional_text
 
-        requests.post(f"https://api.telegram.org/bot{bot_token}/sendDocument", files=files, data=data)
+        requests.post(f"https://proxy.api.030101.xyz/https://api.telegram.org/bot{bot_token}/sendDocument", files=files, data=data)
 
 def clear_files():
     [os.remove(os.path.join(output_path, filename)) for filename in os.listdir(output_path) if filename.startswith(("ASN", "Best")) and filename.endswith(".txt")]
 
 def send_notification(message_text, parse_mode='MarkdownV2'):
-    requests.post(f"https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': parse_mode})
+    requests.post(f"https://proxy.api.030101.xyz/https://api.telegram.org/bot{bot_token}/sendMessage", params={'chat_id': chat_id, 'text': message_text, 'parse_mode': parse_mode})
 
 def scan_and_send_files(url, filename_prefix, additional_text=None, parse_mode='MarkdownV2'):
     data = requests.get(url).text.strip()
