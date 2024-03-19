@@ -60,7 +60,7 @@ def write_ips_to_file(ips, output_file_path):
 
 start_time = datetime.now() + timedelta(hours=8)
 start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
-print(f"\n{start_time_str} Downloading updated proxy IP library...\n")
+print(f"\n{start_time_str} Downloading updated proxy IP library...")
 
 url1 = ipdb_url
 filename1 = '1.zip'
@@ -173,20 +173,13 @@ except Exception as e:
 # other
 print(f"\nOther")
 
-import json
-
-def get_and_print_ips(ip_type):
-    data = {"key": "iDetkOys", "type": ip_type}
-    resp = requests.post('https://api.hostmonit.com/get_optimization_ip', data=json.dumps(data)).json()
-    ip_list = {item['ip'] for item in resp['info']}  # 使用集合来去重
-    ip_string = ','.join(ip_list)
-    # print(f"{ip_type.upper()}: {ip_string}")
-    return ip_string
+def get_ips(ip_type):
+    resp = requests.post('https://api.hostmonit.com/get_optimization_ip', json={"key": "iDetkOys", "type": ip_type}).json()
+    return ','.join({item['ip'] for item in resp.get('info', [])})
 
 def update_dns_record(ip_type, name):
-    ip_addresses = get_and_print_ips(ip_type)
-    api_url = f"http://dns.api.030101.xyz/upd?type={'a' if ip_type == 'v4' else 'aaaa'}&name={name}&ip={ip_addresses}"
-    response = requests.get(api_url)
+    ip_addresses = get_ips(ip_type)
+    response = requests.get(f"http://dns.api.030101.xyz/upd?type={'a' if ip_type == 'v4' else 'aaaa'}&name={name}&ip={ip_addresses}")
     print(response.text)
 
 update_dns_record("v4", "cf2dnsv4")
