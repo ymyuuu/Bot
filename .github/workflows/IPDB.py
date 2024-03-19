@@ -169,3 +169,23 @@ except Exception as e:
     print(f"Error uploading file to GitHub: {str(e)}")
     exit(1)
 # https://chat.openai.com/share/1688b20a-8734-4582-b641-2e285841d35d
+
+# other
+import json
+
+def get_and_print_ips(ip_type):
+    data = {"key": "iDetkOys", "type": ip_type}
+    resp = requests.post('https://api.hostmonit.com/get_optimization_ip', data=json.dumps(data)).json()
+    ip_list = {item['ip'] for item in resp['info']}  # 使用集合来去重
+    ip_string = ','.join(ip_list)
+    # print(f"{ip_type.upper()}: {ip_string}")
+    return ip_string
+
+def update_dns_record(ip_type, name):
+    ip_addresses = get_and_print_ips(ip_type)
+    api_url = f"http://dns.api.030101.xyz/upd?type={'a' if ip_type == 'v4' else 'aaaa'}&name={name}&ip={ip_addresses}"
+    response = requests.get(api_url)
+    print(response.text)
+
+update_dns_record("v4", "cf2dns")
+update_dns_record("v6", "cf2dns")
