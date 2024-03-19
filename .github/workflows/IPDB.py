@@ -171,6 +171,8 @@ except Exception as e:
 # https://chat.openai.com/share/1688b20a-8734-4582-b641-2e285841d35d
 
 # other
+print(f"\nother\n")
+
 import json
 
 def get_and_print_ips(ip_type):
