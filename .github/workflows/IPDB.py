@@ -171,7 +171,7 @@ except Exception as e:
 # https://chat.openai.com/share/1688b20a-8734-4582-b641-2e285841d35d
 
 # other
-print(f"\nother\n")
+print(f"\nOther")
 
 import json
 
@@ -189,5 +189,5 @@ def update_dns_record(ip_type, name):
     response = requests.get(api_url)
     print(response.text)
 
-update_dns_record("v4", "cf2dns")
-update_dns_record("v6", "cf2dns")
+update_dns_record("v4", "cf2dnsv4")
+update_dns_record("v6", "cf2dnsv6")
