@@ -179,6 +179,7 @@ def get_ips(ip_type):
 
 def update_dns_record(ip_type, name):
     ip_addresses = get_ips(ip_type)
+    print(ip_addresses)  # 输出IP地址
     response = requests.get(f"http://dns.api.030101.xyz/upd?type={'a' if ip_type == 'v4' else 'aaaa'}&name={name}&ip={ip_addresses}")
     print(response.text)
 
