@@ -172,7 +172,6 @@ except Exception as e:
 
 # other
 print(f"\nOther")
-requests.get("http://beta.000.pe/del.php")
 
 def get_ips(ip_type):
     resp = requests.post('https://api.hostmonit.com/get_optimization_ip', json={"key": "iDetkOys", "type": ip_type}).json()
