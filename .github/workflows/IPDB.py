@@ -11,7 +11,6 @@ os.chdir(script_directory)
 
 github_token = os.environ.get("ME_GITHUB_TOKEN", "")
 ipdb_url = os.environ.get("IPDB", "")
-other_url = os.environ.get("OTHER", "")
 
 def download_file(url, filename):
     try:
@@ -77,31 +76,8 @@ except RuntimeError as e:
     print(e)
     exit(1)
 
-url2 = other_url
-filename2 = '2.zip'
-try:
-    download_file(url2, filename2)
-except RuntimeError as e:
-    print(e)
-    exit(1)
-
-extract_folder2 = '2'
-try:
-    unzip_file(filename2, extract_folder2)
-except RuntimeError as e:
-    print(e)
-    exit(1)
-
-cloudflare_folder_path = os.path.join(extract_folder2, 'cloudflare-better-ip-main', 'cloudflare')
-
 try:
     merge_txt_files('1', 'all1.txt')
-except RuntimeError as e:
-    print(e)
-    exit(1)
-
-try:
-    merge_txt_files(cloudflare_folder_path, 'all2.txt')
 except RuntimeError as e:
     print(e)
     exit(1)
@@ -112,18 +88,10 @@ except RuntimeError as e:
     print(e)
     exit(1)
 
-try:
-    ips_all2 = list(set(extract_ips_from_file('all2.txt')))
-except RuntimeError as e:
-    print(e)
-    exit(1)
-
-all_ips = ips_all1 + ips_all2
-
-random.shuffle(all_ips)
+random.shuffle(ips_all1)
 
 try:
-    write_ips_to_file(all_ips, 'proxy.txt')
+    write_ips_to_file(ips_all1, 'proxy.txt')
 except RuntimeError as e:
     print(e)
     exit(1)
@@ -168,16 +136,12 @@ try:
 except Exception as e:
     print(f"Error uploading file to GitHub: {str(e)}")
     exit(1)
-# https://chat.openai.com/share/1688b20a-8734-4582-b641-2e285841d35d
 
-# other
 print(f"\nOther")
 
 def get_ips(ip_type):
     try:
-        # 向API发送POST请求，获取优化的IP地址
         resp = requests.post('https://api.hostmonit.com/get_optimization_ip', json={"key": "iDetkOys", "type": ip_type}).json()
-        # 检查'resp'是否包含'info'字段且其值是一个列表
         if isinstance(resp.get('info', []), list):
             ip_addresses = ','.join({item['ip'] for item in resp['info']})
             return ip_addresses
@@ -187,14 +151,9 @@ def get_ips(ip_type):
         return ""
 
 def update_dns_record(ip_type, name):
-    # 获取优化的IP地址
     ip_addresses = get_ips(ip_type)
-    # 构造DNS更新请求的URL
     response = requests.get(f"http://dns.api.030101.xyz/upd?type={'a' if ip_type == 'v4' else 'aaaa'}&name={name}&ip={ip_addresses}")
-    # 打印DNS更新响应
     print(response.text)
 
-# 更新IPv4类型的DNS记录
 update_dns_record("v4", "cf2dnsv4")
-# 更新IPv6类型的DNS记录
 update_dns_record("v6", "cf2dnsv6")
