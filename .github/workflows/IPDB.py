@@ -6,136 +6,80 @@ import random
 import base64
 from datetime import datetime, timedelta
 
-script_directory = os.path.dirname(os.path.realpath(__file__))
-os.chdir(script_directory)
+# 设置脚本工作目录
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
+# 获取环境变量中的GitHub token和文件下载链接
 github_token = os.environ.get("ME_GITHUB_TOKEN", "")
 ipdb_url = os.environ.get("IPDB", "")
 
 def download_file(url, filename):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        with open(filename, 'wb') as file:
-            file.write(response.content)
-    except requests.exceptions.RequestException as e:
-        raise RuntimeError(f'Error downloading {url}: {e}')
+    response = requests.get(url)
+    response.raise_for_status()
+    with open(filename, 'wb') as file:
+        file.write(response.content)
 
 def unzip_file(zip_filename, extract_folder):
-    try:
-        with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
-            zip_ref.extractall(extract_folder)
-    except Exception as e:
-        raise RuntimeError(f'Error unzipping {zip_filename}: {e}')
+    with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
+        zip_ref.extractall(extract_folder)
 
 def merge_txt_files(folder_path, output_filename):
-    try:
-        with open(output_filename, 'w') as output_file:
-            for root, _, files in os.walk(folder_path):
-                for file in files:
-                    if file.endswith('.txt'):
-                        file_path = os.path.join(root, file)
-                        with open(file_path, 'r') as input_file:
-                            output_file.write(input_file.read())
-    except Exception as e:
-        raise RuntimeError(f'Error merging files: {e}')
+    with open(output_filename, 'w') as output_file:
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                if file.endswith('.txt'):
+                    with open(os.path.join(root, file), 'r') as input_file:
+                        output_file.write(input_file.read())
 
 def extract_ips_from_file(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            content = file.read()
-            ips = re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', content)
-            return ips
-    except Exception as e:
-        raise RuntimeError(f'Error extracting IP addresses: {e}')
+    with open(file_path, 'r') as file:
+        content = file.read()
+    return re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', content)
 
 def write_ips_to_file(ips, output_file_path):
-    try:
-        with open(output_file_path, 'w') as output_file:
-            for ip in ips:
-                output_file.write(ip + '\n')
-    except Exception as e:
-        raise RuntimeError(f'Error writing to file: {e}')
+    with open(output_file_path, 'w') as output_file:
+        for ip in ips:
+            output_file.write(ip + '\n')
 
-start_time = datetime.now() + timedelta(hours=8)
-start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
+# 记录当前时间
+start_time_str = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
 print(f"\n{start_time_str} Downloading updated proxy IP library...")
 
-url1 = ipdb_url
-filename1 = '1.zip'
-try:
-    download_file(url1, filename1)
-except RuntimeError as e:
-    print(e)
-    exit(1)
+# 下载并解压文件
+download_file(ipdb_url, 'ipdb.zip')
+unzip_file('ipdb.zip', 'ipdb')
 
-extract_folder1 = '1'
-try:
-    unzip_file(filename1, extract_folder1)
-except RuntimeError as e:
-    print(e)
-    exit(1)
+# 合并文件并提取IP地址
+merge_txt_files('ipdb', 'all_ips.txt')
+ips = list(set(extract_ips_from_file('all_ips.txt')))
+random.shuffle(ips)
+write_ips_to_file(ips, 'proxy.txt')
 
-try:
-    merge_txt_files('1', 'all1.txt')
-except RuntimeError as e:
-    print(e)
-    exit(1)
+# 上传文件到GitHub
+with open('proxy.txt', "r") as file:
+    proxy_txt_content = file.read()
 
-try:
-    ips_all1 = list(set(extract_ips_from_file('all1.txt')))
-except RuntimeError as e:
-    print(e)
-    exit(1)
+proxy_txt_content_base64 = base64.b64encode(proxy_txt_content.encode()).decode()
+get_sha_url = f"https://proxy.api.030101.xyz/https://api.github.com/repos/ymyuuu/IPDB/contents/proxy.txt"
+headers = {"Authorization": f"token {github_token}"}
+sha_response = requests.get(get_sha_url, headers=headers)
 
-random.shuffle(ips_all1)
-
-try:
-    write_ips_to_file(ips_all1, 'proxy.txt')
-except RuntimeError as e:
-    print(e)
-    exit(1)
-
-proxy_txt_file_path = "proxy.txt"
-username = "ymyuuu"
-repo_name = "IPDB"
-
-try:
-    with open(proxy_txt_file_path, "r") as file:
-        proxy_txt_content = file.read()
-
-    proxy_txt_content_base64 = base64.b64encode(proxy_txt_content.encode()).decode()
-
-    get_sha_url = f"https://proxy.api.030101.xyz/https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
-    headers = {
-        "Authorization": f"token {github_token}",
+if sha_response.status_code == 200:
+    current_sha = sha_response.json().get("sha", "")
+    data = {
+        "message": f"Update proxy.txt - {start_time_str} (Total IPs: {len(proxy_txt_content.splitlines())})",
+        "content": proxy_txt_content_base64,
+        "sha": current_sha,
     }
-    sha_response = requests.get(get_sha_url, headers=headers)
-
-    if sha_response.status_code == 200:
-        current_sha = sha_response.json().get("sha", "")
-        data = {
-            "message": f"Update proxy.txt - {start_time_str} (Total IPs: {len(proxy_txt_content.splitlines())})",
-            "content": proxy_txt_content_base64,
-            "sha": current_sha,
-        }
-
-        upload_url = f"https://proxy.api.030101.xyz/https://api.github.com/repos/{username}/{repo_name}/contents/proxy.txt"
-        response = requests.put(upload_url, headers=headers, json=data)
-
-        if response.status_code == 200:
-            current_time_str = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-            print(f"{current_time_str} GitHub update successful for proxy.txt file!")
-        else:
-            print(f"Error uploading file, HTTP status code: {response.status_code}, Error: {response.text}")
-            exit(1)
+    upload_url = f"https://proxy.api.030101.xyz/https://api.github.com/repos/ymyuuu/IPDB/contents/proxy.txt"
+    response = requests.put(upload_url, headers=headers, json=data)
+    if response.status_code == 200:
+        current_time_str = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+        print(f"{current_time_str} GitHub update successful for proxy.txt file!")
     else:
-        print(f"Failed to get current proxy.txt SHA value: {sha_response.text}")
-        exit(1)
-
-except Exception as e:
-    print(f"Error uploading file to GitHub: {str(e)}")
-    exit(1)
+        print(f"Error uploading file, HTTP status code: {response.status_code}, Error: {response.text}")
+else:
+    print(f"Failed to get current proxy.txt SHA value: {sha_response.text}")
 
 print(f"\nOther")
 
@@ -143,10 +87,8 @@ def get_ips(ip_type):
     try:
         resp = requests.post('https://api.hostmonit.com/get_optimization_ip', json={"key": "iDetkOys", "type": ip_type}).json()
         if isinstance(resp.get('info', []), list):
-            ip_addresses = ','.join({item['ip'] for item in resp['info']})
-            return ip_addresses
-        else:
-            return ""
+            return ','.join({item['ip'] for item in resp['info']})
+        return ""
     except (requests.exceptions.RequestException, ValueError, KeyError):
         return ""
 
