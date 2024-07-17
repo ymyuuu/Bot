@@ -66,8 +66,8 @@ try:
     for asn in unique_asns:
         send_to_telegram(os.path.join(output_path, f"ASN{asn}.txt"))
 
-    scan_and_send_files(best_cf_url, "BestCF", additional_text="`bestcf.030101.xyz`", parse_mode='MarkdownV2')
-    scan_和_send_files(best_proxy_url, "BestProxy", additional_text="`bestproxy.030101.xyz`", parse_mode='MarkdownV2')
+    scan_and_send_files(best_cf_url, "BestCF", additional_text="`bestcf.onecf.eu.org`", parse_mode='MarkdownV2')
+    scan_and_send_files(best_proxy_url, "BestProxy", additional_text="`bestproxy.onecf.eu.org`", parse_mode='MarkdownV2')
 
     end_time = datetime.now() + timedelta(hours=8)
     duration = (end_time - start_time).total_seconds()
