@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 def get_ip_info(ip, session, output_path, asn_set):
     try:
-        response = session.get(f"https://proxy.api.030101.xyz/https://ipinfo.io/{ip}?token=294becce387951", timeout=1)
+        response = session.get(f"https://proxy.api.030101.xyz/https://ipinfo.io/{ip}?token=de12fd783c7b3b", timeout=1)
         data = response.json()
 
         asn_match = re.match(r"AS(\d+)", data.get('org', 'N/A'))
