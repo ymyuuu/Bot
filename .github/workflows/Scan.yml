@@ -1,8 +1,8 @@
 name: Scan
 
 on:
-  schedule:
-    - cron: '0 16 * * *'  # 每天的北京时间凌晨0点
+  # schedule:
+  #   - cron: '0 16 * * *'  # 每天的北京时间凌晨0点
   workflow_dispatch:  # 手动触发工作流
 
 jobs:
